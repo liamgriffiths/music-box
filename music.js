@@ -1,13 +1,20 @@
+// references:
+// http://blog.chrislowis.co.uk/2013/06/05/playing-notes-web-audio-api.html
+// http://stuartmemo.com/making-sine-square-sawtooth-and-triangle-waves/
+
 var canvas = document.getElementById('canvas'),
     context = canvas.getContext('2d'),
     audioContext = new webkitAudioContext(),
-    tempo = 50,
-    size = 80,
-    rows = 8,
-    cols = 16,
-    startFreq = 440,
+    keyPresses = [],
+    tempo = 60,
+    tempoControl = document.getElementById('tempo'),
+    size = 40,
+    rows = 12,
+    cols = 32,
+    startFreq = 440 * 2, // one octacve between 440 && 880
+    paused = false, // whether we are currently moving the canvas
     now = audioContext.currentTime,
-    stringX,
+    stringPosition,
     sound;
 
 var squares = [];
