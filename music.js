@@ -5,7 +5,6 @@
 var canvas = document.getElementById('canvas'),
     context = canvas.getContext('2d'),
     audioContext = new webkitAudioContext(),
-    keyPresses = [],
     tempo = 60,
     tempoControl = document.getElementById('tempo'),
     gain = 0.5,
@@ -46,7 +45,6 @@ window.onload = function() {
     }
 
     now = audioContext.currentTime;
-    handleKeys();
     handleForm();
   }
 
@@ -83,17 +81,10 @@ window.onload = function() {
 
   function keydown(e) {
     if(e.keyCode == 32){
-      keyPresses.push('space');
+      // spacebar pauses
+      paused = !paused;
       e.preventDefault();
     }
-  }
-
-  function handleKeys() {
-    var len = keyPresses.length;
-    for(var i = 0; i < len; i++){
-      if(keyPresses[i] == 'space') paused = !paused;
-    }
-    keyPresses = [];
   }
 
   function handleForm() {
@@ -179,7 +170,7 @@ Square.prototype = {
         // create a synthetic tone for now
         // replace with microphone?
         var tone = audioContext.createOscillator();
-        tone.type = 0;
+        tone.type = 1;
         tone.frequency.value = this.freq;
 
         // create a new sound and play it (now)
