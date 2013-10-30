@@ -8,6 +8,8 @@ var canvas = document.getElementById('canvas'),
     keyPresses = [],
     tempo = 60,
     tempoControl = document.getElementById('tempo'),
+    gain = 0.5,
+    gainControl = document.getElementById('gain'),
     size = 40,
     rows = 12,
     cols = 32,
@@ -95,7 +97,9 @@ window.onload = function() {
   }
 
   function handleForm() {
-    tempo = tempoControl.value;
+    // tempo = t(tempoControl.valueyy);
+    tempo = parseInt(tempoControl.value);
+    gain = parseInt(gainControl.value);
   }
 
   setup();
@@ -215,7 +219,22 @@ function Color(i) {
 // returns a context
 function Sound(source) {
 
-  source.connect(audioContext.destination);
+  // create a gain node - which can be used to alter the volume of the input
+  var volume = audioContext.createGain();
+  volume.gain.value = gain;
+  source.connect(volume);
+
+  // create convolver node
+  // var reverb = audioContext.createConvolver();
+  // volume.connect(reverb);
+
+  // create delay node
+  var delay = audioContext.createDelay();
+  delay.delayTime.value = 0;
+  volume.connect(delay);
+
+
+  delay.connect(audioContext.destination);
   return source;
 }
 
