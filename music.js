@@ -22,9 +22,10 @@ var squares = [];
 window.onload = function() {
   function setup() {
     canvas.width = screen.width;
-    canvas.height = screen.height;
-    stringX = canvas.width / 4;
-    canvas.addEventListener("click", click, false);
+    canvas.height = size * rows + (size / 2.5) * rows + size;
+    stringPosition = canvas.width / 4;
+    canvas.addEventListener('click', click, false);
+    window.addEventListener('keydown', keydown);
 
     for(var x = 0; x < cols; x++) {
       for(var y = 0; y < rows; y++) {
@@ -36,25 +37,30 @@ window.onload = function() {
 
   function update() {
     canvas.width = canvas.width;
-    for(var i = 0; i < squares.length; i++){
+    var len = squares.length;
+    for(var i = 0; i < len; i++){
       var square = squares[i];
-      squares[i].update();
+      square.update();
     }
 
     now = audioContext.currentTime;
+    handleKeys();
+    handleForm();
   }
 
   function draw() {
-    // draw squares
-    for(var i = 0; i < squares.length; i++){
-      squares[i].draw();
-      squares[i].play();
+    // draw squares, play sounds
+    var len = squares.length;
+    for(var i = 0; i < len; i++){
+      var square = squares[i];
+      square.draw();
+      square.play();
     }
 
     // draw string
     context.strokeStyle = 'white';
-    context.moveTo(stringX, 0);
-    context.lineTo(stringX, canvas.height);
+    context.moveTo(stringPosition, 0);
+    context.lineTo(stringPosition, canvas.height);
     context.stroke();
   }
 
