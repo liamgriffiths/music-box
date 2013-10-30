@@ -105,66 +105,61 @@ window.onload = function() {
 function Square(x, y) {
   this.x = x;
   this.y = y;
-  this.offset = 20;
-  this.speed = this.calcSpeed();
-  this.px = this.getPixel(x);
-  this.py = this.getPixel(y);
+  this.offset = Math.floor(size / 2.5);
+  this.px = this.getPixelPosition(x);
+  this.py = this.getPixelPosition(y);
   this.on = false;
-  this.onScreen = this.isOnScreen();
-  this.active = this.isActive();
+  this.active = false;
   this.playing = false;
-  this.tone = undefined;
-  this.freq = 440 + ((440 / rows) * y);
+  this.sound = undefined;
+  this.freq = startFreq - ((startFreq / 2 / rows) * y);
+  this.color = new Color(y);
 }
 
 Square.prototype = {
-  calcSpeed: function() {
+  currentSpeed: function() {
+    if(paused) return 0;
     return (tempo / 60.0) / cols;
   },
 
   draw: function() {
-    if(this.on){
-      if(this.active) {
-        context.fillStyle = "rgb(255, 255, 255)";
+    if(this.isOnScreen()){
+      if(this.on) {
+        // active squares are currently touching the line
+        if(this.active) {
+          context.fillStyle = this.color.rgba(0.9);
+          context.fillRect(this.px, this.py, size, size);
+          context.fillStyle = "rgba(255, 255, 255, 0.7)";
+          context.fillRect(this.px - 1, this.py - 1, size + 2, size + 2);
+        }else{
+          context.fillStyle = this.color.rgba(0.9);
+          context.fillRect(this.px, this.py, size, size);
+        }
       }else{
-        context.fillStyle = "rgb(255, 200, 200)";
+        context.fillStyle = this.color.rgba(0.4);
+        context.fillRect(this.px, this.py, size, size);
       }
-    }else{
-      context.fillStyle = "rgb(200, 0, 0)";
-    }
-    if(this.isOnScreen){
-      context.fillRect(this.px, this.py, size, size);
     }
   },
 
   update: function() {
-    this.speed = this.calcSpeed();
-    this.onScreen = this.isOnScreen();
     this.active = this.isActive();
     if(this.px + size < 0) this.x = cols - 1;
-    this.x -= this.speed;
-    this.px = this.getPixel(this.x);
-    this.py = this.getPixel(this.y);
+    this.x -= this.currentSpeed();
+    this.px = this.getPixelPosition(this.x);
+    this.py = this.getPixelPosition(this.y);
   },
 
-  getPixel: function(p) {
+  getPixelPosition: function(p) {
     return p * size + (p * this.offset + this.offset);
   },
 
   isOnScreen: function() {
-    if(this.px < canvas.width && this.px + size > 0){
-      return true;
-    }else{
-      return false;
-    }
+    return (this.px < canvas.width && this.px + size > 0);
   },
 
   isActive: function() {
-    if(this.px < stringX && this.px + size > stringX){
-      return true;
-    }else{
-      return false;
-    }
+    return (this.px < stringPosition && this.px + size > stringPosition);
   },
 
   updateIfClicked: function(cx, cy) {
