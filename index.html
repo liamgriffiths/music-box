@@ -1,20 +1,37 @@
+<!DOCTYPE html>
 <html>
   <head>
     <style>
       body {
         margin: 0;
         padding: 0;
+        background-color: #ccc;
       }
       canvas {
         background-color: #000;
+      }
+      #controls {
+        padding-left: 10px;
+      }
+      #controls label {
+        padding: 16px;
+        font-size: 22px;
+        font-family: monospace;
+        display: block;
+        float: left;
+      }
+      #controls input {
+        font-size: 22px;
+        width: 70px;
       }
     </style>
   </head>
   <body>
     <canvas id="canvas"></canvas>
+    <form id="controls" onsubmit="return false;">
+      <label>Tempo <input id="tempo" value="60"></label>
+      <label>Gain <input id="gain" value="60"></label>
+    </form>
     <script src="music.js" type="text/javascript"></script>
-    <!-- <script src="out/goog/base.js" type="text/javascript"></script> -->
-    <!-- <script src="music_box.js" type="text/javascript"></script> -->
-    <!-- <script type="text/javascript">goog.require("music_box.core");</script> -->
   </body>
 </html>
