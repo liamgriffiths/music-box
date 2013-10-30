@@ -173,22 +173,50 @@ Square.prototype = {
 
   play: function() {
     if(! this.playing && this.on && this.active){
-        this.tone = audioContext.createOscillator();
-        this.tone.connect(audioContext.destination);
-        this.tone.type = 0;
-        this.tone.frequency.value = this.freq;
-        this.tone.noteOn(now);
+        // create a synthetic tone for now
+        // replace with microphone?
+        var tone = audioContext.createOscillator();
+        tone.type = 0;
+        tone.frequency.value = this.freq;
+
+        // create a new sound and play it (now)
+        this.sound = new Sound(tone);
         this.playing = true;
+        this.sound.start(now);
     }else if(this.playing && this.on && !this.active){
-      // this.tone.stop(0);
-      this.tone.noteOff(0);
+      this.sound.stop(0);
       this.playing = false;
     }
   }
 };
 
-// http://blog.chrislowis.co.uk/2013/06/05/playing-notes-web-audio-api.html
-// http://stuartmemo.com/making-sine-square-sawtooth-and-triangle-waves/
+// builds rgb(a) color strings for drawing to canvas
+function Color(i) {
+  var colors = [[177,  14,  30],  // RED
+                [223,  48,  52],  // LRED
+                [  0, 100,  53],  // GREEN
+                [244, 119,  56],  // ORANGE
+                [255, 191,  71],  // YELLOW
+                [  0, 120, 186],  // BBLUE
+                [  0,   0, 255],  // BLUE
+                [ 43, 140, 196],  // LBLUE
+                [ 40, 161, 151],  // CYAN
+                [213,  56, 128],  // PINK
+                [ 77,  41,  66],  // DPURPLE
+                [133, 153,  75]]; // LGREEN
+  var color = colors[i % colors.length];
+  this.rgb = 'rgb(' + color.join(',') + ')';
+  this.rgba = function(a) {
+    return 'rgba(' + color.concat(a).join(',') + ')';
+  };
+}
 
+// takes a source and pushes it through available effect audio nodes to output
+// returns a context
+function Sound(source) {
+
+  source.connect(audioContext.destination);
+  return source;
+}
 
 
