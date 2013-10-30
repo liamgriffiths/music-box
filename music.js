@@ -122,8 +122,7 @@ function Square(x, y) {
 
 Square.prototype = {
   currentSpeed: function() {
-    if(paused) return 0;
-    return (tempo / 60.0) / cols;
+    return paused ? 0 : (tempo / 60.0) / cols;
   },
 
   draw: function() {
@@ -140,7 +139,7 @@ Square.prototype = {
           context.fillRect(this.px, this.py, size, size);
         }
       }else{
-        context.fillStyle = this.color.rgba(0.4);
+        context.fillStyle = this.color.rgba(0.2);
         context.fillRect(this.px, this.py, size, size);
       }
     }
