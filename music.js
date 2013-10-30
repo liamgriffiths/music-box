@@ -79,6 +79,25 @@ window.onload = function() {
     }
   }
 
+  function keydown(e) {
+    if(e.keyCode == 32){
+      keyPresses.push('space');
+      e.preventDefault();
+    }
+  }
+
+  function handleKeys() {
+    var len = keyPresses.length;
+    for(var i = 0; i < len; i++){
+      if(keyPresses[i] == 'space') paused = !paused;
+    }
+    keyPresses = [];
+  }
+
+  function handleForm() {
+    tempo = tempoControl.value;
+  }
+
   setup();
   main();
 };
