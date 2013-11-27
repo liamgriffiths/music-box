@@ -4,7 +4,7 @@
 
 var canvas = document.getElementById('canvas'),
     context = canvas.getContext('2d'),
-    audioContext = new webkitAudioContext(),
+    audioContext = new (window.AudioContext || window.webkitAudioContext)(),
     tempo = 60,
     tempoControl = document.getElementById('tempo'),
     gain = 0.5,
