@@ -1,6 +1,11 @@
 // references:
 // http://blog.chrislowis.co.uk/2013/06/05/playing-notes-web-audio-api.html
 // http://stuartmemo.com/making-sine-square-sawtooth-and-triangle-waves/
+//
+// to read:
+// http://flippinawesome.org/2013/10/28/audio-synthesis-in-javascript/?utm_source=html5weekly&utm_medium=email
+// https://developer.tizen.org/documentation/articles/advanced-web-audio-api-usage
+// http://joshondesign.com/p/books/canvasdeepdive/chapter12.html
 
 var canvas = document.getElementById('canvas'),
     context = canvas.getContext('2d'),
