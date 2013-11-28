@@ -17,45 +17,37 @@ window.requestAnimFrame = (function(){
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 function MusicBox(settings) {
+  // how many squares to put on the screen
   this.rows = settings.rows || 12;
   this.cols = settings.cols || 32;
   this.squareSize = settings.squareSize || 40;
+  this.squares = [];
+
+  // setup the canvas, context
   this.canvas = document.getElementById('canvas');
   this.canvas.width = document.documentElement.clientWidth;
   this.canvas.height = this.squareSize * this.rows + (this.squareSize / 2.5) * this.rows + this.squareSize;
-  this.context = this.canvas.getContext('2d');
+  this.ctx = this.canvas.getContext('2d');
+
+  // where to put the string
   this.stringPosition = settings.stringPosition || (this.canvas.width / 4);
-  this.squares = [];
 
-  this.tempo = 60;
+  // setup the control knobs
   this.tempoControl = document.getElementById('tempo');
-  this.gain = 1;
   this.gainControl = document.getElementById('gain');
+  this.tempo = this.tempoControl.value;
+  this.gain = this.gainControl.value;
 
-  this.startSpeed = settings.startSpeed || (this.tempo / 60 / this.cols);
-
-  this.audioContext = new window.AudioContext();
-  this.now = this.audioContext.currentTime;
-
+  // setup the audio context, start keeping time
+  this.actx = new window.AudioContext();
   this.isPlaying = true;
 
-  canvas.addEventListener('click', function(e) {
-    var x = e.pageX - canvas.offsetLeft;
-    var y = e.pageY - canvas.offsetTop;
-    _each(this.squares, function(square) { square.updateIfClicked(x, y); });
-  }.bind(this));
-
-  window.addEventListener('keydown', function(e) {
-    if(e.keyCode == 32){
-      this.isPlaying = !this.isPlaying;
-      e.preventDefault();
-    }
-  }.bind(this));
+  var speed = this.tempo / 60 / this.cols;
 
   for(var x = 0; x < this.cols; x++) {
     for(var y = 0; y < this.rows; y++) {
       var freq = 880 - ((880 / 2 / this.rows) * y);
-      this.squares.push(new Square(x, y, this.startSpeed, freq, this.cols - 1, this.squareSize));
+      this.squares.push(new Square(x, y, speed, freq, this.cols - 1, this.squareSize));
     }
   }
 }
@@ -63,14 +55,11 @@ function MusicBox(settings) {
 MusicBox.prototype = {
   update: function() {
     // update squares
-    _each(this.squares, function(square) {
-      square.update({
-        stringPosition: this.stringPosition,
-        speed: this.isPlaying ? (this.tempo / 60) / this.cols : 0
-      });
-    }.bind(this));
-
-    this.now = this.audioContext.currentTime;
+    var settings = {
+      stringPosition: this.stringPosition,
+      speed: this.isPlaying ? (this.tempo / 60 / this.cols) : 0
+    };
+    _each(this.squares, function(i, sq) { sq.update(settings); });
 
     // update values from form
     this.tempo = parseInt(this.tempoControl.value, 10);
@@ -79,25 +68,32 @@ MusicBox.prototype = {
 
   draw: function() {
     // clear canvas
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // draw squares
-    _each(this.squares, function(square) {
-      square.draw(this.context);
-    }.bind(this));
+    _each(this.squares, function(i, sq) { sq.draw(this.ctx); }, this);
 
     // draw string
-    this.context.strokeStyle = 'white';
-    this.context.moveTo(this.stringPosition, 0);
-    this.context.lineTo(this.stringPosition, this.canvas.height);
-    this.context.stroke();
+    this.ctx.strokeStyle = 'white';
+    this.ctx.moveTo(this.stringPosition, 0);
+    this.ctx.lineTo(this.stringPosition, this.canvas.height);
+    this.ctx.stroke();
   },
 
   play: function() {
     // play squares
-    _each(this.squares, function(square) {
-      square.play(this.audioContext, this.now);
-    }.bind(this));
+    var now = this.actx.currentTime;
+    _each(this.squares, function(i, sq) { sq.play(this.actx, now); }, this);
+  },
+
+  togglePlaying: function() {
+    this.isPlaying = !this.isPlaying;
+  },
+
+  handleClick: function(e) {
+    var x = e.pageX - this.canvas.offsetLeft;
+    var y = e.pageY - this.canvas.offsetTop;
+    _each(this.squares, function(i, sq) { sq.updateIfClicked(x, y); });
   },
 
   kickOutTheJams: function() {
@@ -108,15 +104,29 @@ MusicBox.prototype = {
   }
 };
 
-function _each(array, fn) {
+function _each(array, fn, context) {
   var len = array.length;
   for (var i = 0; i < len; i++) {
-    fn(array[i], i);
+    fn.call(context, i, array[i]);
   }
 }
 
 window.onload = function() {
-  new MusicBox({}).kickOutTheJams();
+  // kick off the app
+  var musicbox = new MusicBox({});
+  musicbox.kickOutTheJams();
+
+  musicbox.canvas.addEventListener('click', function(e) {
+    musicbox.handleClick(e);
+  });
+
+  window.addEventListener('keydown', function(e) {
+    if (e.keyCode == 32){
+      musicbox.togglePlaying();
+      e.preventDefault();
+    }
+  });
+
 };
 
 function Square(x, y, speed, freq, start, size) {
