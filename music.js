@@ -7,107 +7,6 @@
 // https://developer.tizen.org/documentation/articles/advanced-web-audio-api-usage
 // http://joshondesign.com/p/books/canvasdeepdive/chapter12.html
 
-<<<<<<< HEAD
-var canvas = document.getElementById('canvas'),
-    context = canvas.getContext('2d'),
-    audioContext = new (window.AudioContext || window.webkitAudioContext)(),
-    tempo = 60,
-    tempoControl = document.getElementById('tempo'),
-    gain = 0.5,
-    gainControl = document.getElementById('gain'),
-    size = 40,
-    rows = 12,
-    cols = 32,
-    startFreq = 440 * 2, // one octacve between 440 && 880
-    paused = false, // whether we are currently moving the canvas
-    now = audioContext.currentTime,
-    stringPosition,
-    sound;
-
-var squares = [];
-
-window.onload = function() {
-  function setup() {
-    canvas.width = screen.width;
-    canvas.height = size * rows + (size / 2.5) * rows + size;
-    stringPosition = canvas.width / 4;
-    canvas.addEventListener('click', click, false);
-    window.addEventListener('keydown', keydown);
-
-    for(var x = 0; x < cols; x++) {
-      for(var y = 0; y < rows; y++) {
-        squares.push(new Square(x, y));
-      }
-    }
-
-  }
-
-  function update() {
-    canvas.width = canvas.width;
-    var len = squares.length;
-    for(var i = 0; i < len; i++){
-      var square = squares[i];
-      square.update();
-    }
-
-    now = audioContext.currentTime;
-    handleForm();
-  }
-
-  function draw() {
-    // draw squares, play sounds
-    var len = squares.length;
-    for(var i = 0; i < len; i++){
-      var square = squares[i];
-      square.draw();
-      square.play();
-    }
-
-    // draw string
-    context.strokeStyle = 'white';
-    context.moveTo(stringPosition, 0);
-    context.lineTo(stringPosition, canvas.height);
-    context.stroke();
-  }
-
-  function main() {
-    update();
-    draw();
-    window.requestAnimationFrame(main);
-  }
-
-  function click(e) {
-    var x = e.pageX - canvas.offsetLeft;
-    var y = e.pageY - canvas.offsetTop;
-
-    for(var i = 0; i < squares.length; i++){
-      squares[i].updateIfClicked(x, y);
-    }
-  }
-
-  function keydown(e) {
-    if(e.keyCode == 32){
-      // spacebar pauses
-      paused = !paused;
-      e.preventDefault();
-    }
-  }
-
-  function handleForm() {
-    // tempo = t(tempoControl.valueyy);
-    tempo = parseInt(tempoControl.value);
-    gain = parseInt(gainControl.value);
-  }
-
-  setup();
-  main();
-};
-
-function Square(x, y) {
-  this.x = x;
-  this.y = y;
-  this.offset = Math.floor(size / 2.5);
-=======
 window.requestAnimFrame = (function(){
   return window.requestAnimationFrame  ||
     window.webkitRequestAnimationFrame ||
@@ -235,25 +134,12 @@ function Square(x, y, speed, freq, start, size) {
   this.y = y;
   this.size = size;
   this.offset = Math.floor(this.size / 2.5);
->>>>>>> master
   this.px = this.getPixelPosition(x);
   this.py = this.getPixelPosition(y);
   this.on = false;
   this.active = false;
   this.playing = false;
   this.sound = undefined;
-<<<<<<< HEAD
-  this.freq = startFreq - ((startFreq / 2 / rows) * y);
-  this.color = new Color(y);
-}
-
-Square.prototype = {
-  currentSpeed: function() {
-    return paused ? 0 : (tempo / 60.0) / cols;
-  },
-
-  draw: function() {
-=======
   this.freq = freq;
   this.color = new Color(y);
   this.speed = speed;
@@ -262,24 +148,10 @@ Square.prototype = {
 
 Square.prototype = {
   draw: function(ctx) {
->>>>>>> master
     if(this.isOnScreen()){
       if(this.on) {
         // active squares are currently touching the line
         if(this.active) {
-<<<<<<< HEAD
-          context.fillStyle = this.color.rgba(0.9);
-          context.fillRect(this.px, this.py, size, size);
-          context.fillStyle = "rgba(255, 255, 255, 0.7)";
-          context.fillRect(this.px - 1, this.py - 1, size + 2, size + 2);
-        }else{
-          context.fillStyle = this.color.rgba(0.9);
-          context.fillRect(this.px, this.py, size, size);
-        }
-      }else{
-        context.fillStyle = this.color.rgba(0.2);
-        context.fillRect(this.px, this.py, size, size);
-=======
           ctx.fillStyle = this.color.rgba(0.9);
           ctx.fillRect(this.px, this.py, this.size, this.size);
           ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
@@ -291,17 +163,10 @@ Square.prototype = {
       }else{
         ctx.fillStyle = this.color.rgba(0.2);
         ctx.fillRect(this.px, this.py, this.size, this.size);
->>>>>>> master
       }
     }
   },
 
-<<<<<<< HEAD
-  update: function() {
-    this.active = this.isActive();
-    if(this.px + size < 0) this.x = cols - 1;
-    this.x -= this.currentSpeed();
-=======
   update: function(settings) {
     for (var prop in settings) {
       this[prop] = settings[prop];
@@ -310,28 +175,11 @@ Square.prototype = {
     this.active = this.isActive(settings.stringPosition);
     if (this.px + this.size < 0) this.x = this.start;
     this.x -= this.speed;
->>>>>>> master
     this.px = this.getPixelPosition(this.x);
     this.py = this.getPixelPosition(this.y);
   },
 
   getPixelPosition: function(p) {
-<<<<<<< HEAD
-    return p * size + (p * this.offset + this.offset);
-  },
-
-  isOnScreen: function() {
-    return (this.px < canvas.width && this.px + size > 0);
-  },
-
-  isActive: function() {
-    return (this.px < stringPosition && this.px + size > stringPosition);
-  },
-
-  updateIfClicked: function(cx, cy) {
-    if(cx > this.px && cx < this.px + size){
-      if(cy > this.py && cy < this.py + size){
-=======
     return p * this.size + (p * this.offset + this.offset);
   },
 
@@ -346,39 +194,24 @@ Square.prototype = {
   updateIfClicked: function(cx, cy) {
     if(cx > this.px && cx < this.px + this.size){
       if(cy > this.py && cy < this.py + this.size){
->>>>>>> master
         this.on = !this.on;
       }
     }
     return this.on;
   },
 
-<<<<<<< HEAD
-  play: function() {
-    if(! this.playing && this.on && this.active){
-        // create a synthetic tone for now
-        // replace with microphone?
-        var tone = audioContext.createOscillator();
-=======
   play: function(actx, time) {
     if(! this.playing && this.on && this.active){
         // create a synthetic tone for now
         // replace with microphone?
         var tone = actx.createOscillator();
->>>>>>> master
         tone.type = 1;
         tone.frequency.value = this.freq;
 
         // create a new sound and play it (now)
-<<<<<<< HEAD
-        this.sound = new Sound(tone);
-        this.playing = true;
-        this.sound.start(now);
-=======
         this.sound = new Sound(actx, tone);
         this.playing = true;
         this.sound.start(time);
->>>>>>> master
     }else if(this.playing && this.on && !this.active){
       this.sound.stop(0);
       this.playing = false;
@@ -409,17 +242,10 @@ function Color(i) {
 
 // takes a source and pushes it through available effect audio nodes to output
 // returns a context
-<<<<<<< HEAD
-function Sound(source) {
-
-  // create a gain node - which can be used to alter the volume of the input
-  var volume = audioContext.createGain();
-=======
 function Sound(actx, source) {
 
   // create a gain node - which can be used to alter the volume of the input
   var volume = actx.createGain();
->>>>>>> master
   volume.gain.value = gain;
   source.connect(volume);
 
@@ -428,21 +254,11 @@ function Sound(actx, source) {
   // volume.connect(reverb);
 
   // create delay node
-<<<<<<< HEAD
-  var delay = audioContext.createDelay();
-=======
   var delay = actx.createDelay();
->>>>>>> master
   delay.delayTime.value = 0;
   volume.connect(delay);
 
 
-<<<<<<< HEAD
-  delay.connect(audioContext.destination);
-=======
   delay.connect(actx.destination);
->>>>>>> master
   return source;
 }
-
-
